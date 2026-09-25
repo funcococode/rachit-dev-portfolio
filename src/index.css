@@ -1,0 +1,79 @@
+@import '@fontsource-variable/bricolage-grotesque/opsz.css';
+@import '@fontsource-variable/jetbrains-mono';
+@import 'lenis/dist/lenis.css';
+@import 'tailwindcss';
+
+/*
+  Kinetic Color — the page background morphs between these as you scroll.
+  Every section declares its own bg/fg through <Stage>, so text, borders
+  and muted copy use currentColor and adapt automatically.
+*/
+@theme {
+  --color-cream: #f3eee3;
+  --color-ink: #141414;
+  --color-cobalt: #2f3cff;
+  --color-lime: #d4ff3a;
+  --color-tang: #ff6a3d;
+  --color-pink: #ffb4dc;
+  --color-sky: #9fd8ff;
+
+  --font-sans: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    font-family: var(--font-sans);
+    font-optical-sizing: auto;
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: var(--color-lime);
+    color: var(--color-ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    html.has-cursor,
+    html.has-cursor * {
+      cursor: none !important;
+    }
+  }
+}
+
+/* colour-agnostic helpers — they follow whatever the current section's fg is */
+@utility line {
+  border-color: color-mix(in srgb, currentColor 18%, transparent);
+}
+@utility bg-line {
+  background-color: color-mix(in srgb, currentColor 18%, transparent);
+}
+@utility muted {
+  color: color-mix(in srgb, currentColor 62%, transparent);
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-[1600px] px-5 md:px-10;
+  }
+  .eyebrow {
+    @apply font-mono text-[11px] uppercase tracking-[0.16em];
+  }
+  .display {
+    @apply font-sans font-extrabold leading-[0.84] tracking-[-0.045em];
+  }
+  /* chunky sticker look: thick outline + hard offset shadow */
+  .sticker {
+    @apply rounded-full border-2 border-ink px-4 py-2 font-semibold text-ink shadow-[3px_3px_0_0_var(--color-ink)];
+  }
+  .card-pop {
+    @apply rounded-[28px] border-2 border-ink shadow-[6px_6px_0_0_var(--color-ink)];
+  }
+}

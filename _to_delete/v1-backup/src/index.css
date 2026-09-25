@@ -1,0 +1,91 @@
+@import '@fontsource-variable/geist';
+@import '@fontsource/instrument-serif/400.css';
+@import '@fontsource/instrument-serif/400-italic.css';
+@import '@fontsource-variable/jetbrains-mono';
+@import 'lenis/dist/lenis.css';
+@import 'tailwindcss';
+
+@theme {
+  --color-ink: #0b0a09;
+  --color-ink-2: #141210;
+  --color-ink-3: #1d1a17;
+  --color-bone: #efe8dc;
+  --color-ash: #8e877c;
+  --color-ember: #ff5b24;
+  --color-line: rgb(239 232 220 / 0.12);
+
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-ink);
+    color: var(--color-bone);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-ink);
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: var(--color-ember);
+    color: var(--color-ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    html.has-cursor,
+    html.has-cursor * {
+      cursor: none !important;
+    }
+  }
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-[1600px] px-5 md:px-10;
+  }
+  .eyebrow {
+    @apply font-mono text-[11px] tracking-[0.18em] text-ash uppercase;
+  }
+  .display {
+    @apply font-sans font-semibold tracking-[-0.055em] leading-[0.86];
+  }
+  .serif-i {
+    @apply font-serif font-normal italic tracking-[-0.02em];
+  }
+  .hairline {
+    @apply border-line;
+  }
+}
+
+/* film grain */
+.grain {
+  pointer-events: none;
+  position: fixed;
+  inset: -100%;
+  width: 300%;
+  height: 300%;
+  z-index: 60;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 8s steps(10) infinite;
+}
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  30% { transform: translate(3%, -15%); }
+  50% { transform: translate(12%, 9%); }
+  70% { transform: translate(9%, 4%); }
+  90% { transform: translate(-1%, 7%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain { animation: none; }
+}
