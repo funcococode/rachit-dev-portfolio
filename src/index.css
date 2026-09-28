@@ -4,21 +4,45 @@
 @import 'tailwindcss';
 
 /*
-  Kinetic Color — the page background morphs between these as you scroll.
-  Every section declares its own bg/fg through <Stage>, so text, borders
-  and muted copy use currentColor and adapt automatically.
+  Two colours per theme, no curves.
+  Every section is a <Stage> that is either green-on-cream or cream-on-green;
+  the page cross-fades between them as you scroll. Borders, rules and muted
+  text all use currentColor, so they flip automatically.
 */
+/* Theme palettes — keep in sync with src/lib/themes.js */
+:root,
+[data-theme='forest'] { --theme-dark: #064e3b; --theme-light: #f8e7c9; }
+[data-theme='neon'] { --theme-dark: #10140a; --theme-light: #d9ff42; }
+[data-theme='ember'] { --theme-dark: #c2410c; --theme-light: #fff1e3; }
+[data-theme='scarlet'] { --theme-dark: #b91c1c; --theme-light: #fdeceb; }
+[data-theme='cobalt'] { --theme-dark: #1e3fd9; --theme-light: #eef1ff; }
+
+/* Dark mode — deep page tone, theme colour as the accent blocks */
+[data-mode='dark'] { color-scheme: dark; }
+[data-mode='dark'],
+[data-mode='dark'][data-theme='forest'] { --theme-dark: #f8e7c9; --theme-light: #05261d; }
+[data-mode='dark'][data-theme='neon'] { --theme-dark: #d9ff42; --theme-light: #10140a; }
+[data-mode='dark'][data-theme='ember'] { --theme-dark: #ff7a3d; --theme-light: #1c0d05; }
+[data-mode='dark'][data-theme='scarlet'] { --theme-dark: #ff5c56; --theme-light: #1c0707; }
+[data-mode='dark'][data-theme='cobalt'] { --theme-dark: #8298ff; --theme-light: #070b22; }
+
+/* "green" and "cream" are the semantic dark/light slots — they follow the theme */
+@theme inline {
+  --color-green: var(--theme-dark);
+  --color-cream: var(--theme-light);
+  /* "deep" is always the darker of the pair, "bright" the lighter (for loaders/transitions) */
+  --color-deep: var(--deep);
+  --color-bright: var(--bright);
+}
+:root { --deep: var(--theme-dark); --bright: var(--theme-light); }
+[data-mode='dark'] { --deep: var(--theme-light); --bright: var(--theme-dark); }
+
 @theme {
-  --color-cream: #f3eee3;
-  --color-ink: #141414;
-  --color-cobalt: #2f3cff;
-  --color-lime: #d4ff3a;
-  --color-tang: #ff6a3d;
-  --color-pink: #ffb4dc;
-  --color-sky: #9fd8ff;
 
   --font-sans: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --radius-*: initial; /* boxy: no rounded corners anywhere */
 
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-quart: cubic-bezier(0.76, 0, 0.24, 1);
@@ -27,7 +51,7 @@
 @layer base {
   html {
     background: var(--color-cream);
-    color: var(--color-ink);
+    color: var(--color-green);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -37,8 +61,8 @@
     overflow-x: hidden;
   }
   ::selection {
-    background: var(--color-lime);
-    color: var(--color-ink);
+    background: var(--color-green);
+    color: var(--color-cream);
   }
   @media (hover: hover) and (pointer: fine) {
     html.has-cursor,
@@ -48,32 +72,47 @@
   }
 }
 
-/* colour-agnostic helpers — they follow whatever the current section's fg is */
-@utility line {
-  border-color: color-mix(in srgb, currentColor 18%, transparent);
+/* colour-agnostic helpers — they follow the current section's text colour */
+@utility rule {
+  border-color: currentColor;
 }
-@utility bg-line {
-  background-color: color-mix(in srgb, currentColor 18%, transparent);
+@utility rule-soft {
+  border-color: color-mix(in srgb, currentColor 25%, transparent);
 }
 @utility muted {
-  color: color-mix(in srgb, currentColor 62%, transparent);
+  color: color-mix(in srgb, currentColor 68%, transparent);
 }
 
 @layer components {
   .container-x {
-    @apply mx-auto w-full max-w-[1600px] px-5 md:px-10;
+    @apply mx-auto w-full max-w-[1600px] px-4 md:px-8;
   }
   .eyebrow {
     @apply font-mono text-[11px] uppercase tracking-[0.16em];
   }
   .display {
-    @apply font-sans font-extrabold leading-[0.84] tracking-[-0.045em];
+    @apply font-sans font-bold leading-[0.88] tracking-[-0.04em];
   }
-  /* chunky sticker look: thick outline + hard offset shadow */
-  .sticker {
-    @apply rounded-full border-2 border-ink px-4 py-2 font-semibold text-ink shadow-[3px_3px_0_0_var(--color-ink)];
-  }
-  .card-pop {
-    @apply rounded-[28px] border-2 border-ink shadow-[6px_6px_0_0_var(--color-ink)];
-  }
+}
+
+/* tiny equalizer used in the discography table */
+@keyframes eq {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+.eq-bar {
+  animation: eq 0.8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .eq-bar { animation: none; transform: scaleY(0.6); }
+}
+
+/* split-flap board — each new glyph drops in from the hinge */
+@keyframes flap {
+  from { transform: rotateX(-90deg); opacity: 0.2; }
+  to { transform: rotateX(0); opacity: 1; }
+}
+.flap-in {
+  animation: flap 0.12s ease-out;
+  transform-origin: 50% 0;
 }

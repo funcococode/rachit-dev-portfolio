@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 
 /**
  * Custom cursor. No context needed — any element can opt in with:
- *   data-cursor="View"        → big lime disc with a label
+ *   data-cursor="View"        → a solid label box
  *   data-cursor-hide          → hides the cursor (e.g. over iframes)
  * Links and buttons automatically get a hover state.
  */
@@ -57,38 +57,32 @@ export default function Cursor() {
   if (!enabled) return null
 
   const { label, hover, hidden, down } = state
-  const scale = hidden ? 0 : label ? 1 : hover ? 0.42 : 0.14
-  const size = 104
 
   return (
-    <motion.div
-      aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[100]"
-      style={{ x: sx, y: sy }}
-    >
-      <motion.div
-        className={`-ml-[52px] -mt-[52px] flex items-center justify-center rounded-full ${
-          label ? 'border-2 border-ink bg-lime' : 'bg-white mix-blend-difference'
-        }`}
-        style={{ width: size, height: size }}
-        animate={{ scale: down ? scale * 0.8 : scale }}
-        transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-      >
-        <AnimatePresence mode="wait">
-          {label && (
-            <motion.span
-              key={label}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25 }}
-              className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink"
-            >
-              {label}
-            </motion.span>
-          )}
-        </AnimatePresence>
-      </motion.div>
+    <motion.div aria-hidden className="pointer-events-none fixed left-0 top-0 z-[100]" style={{ x: sx, y: sy }}>
+      <AnimatePresence mode="wait" initial={false}>
+        {label ? (
+          <motion.div
+            key="label"
+            className="-translate-x-1/2 -translate-y-1/2 whitespace-nowrap border border-[var(--bg)] bg-[var(--fg)] px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--bg)]"
+            initial={{ scale: 0.4, opacity: 0 }}
+            animate={{ scale: down ? 0.9 : 1, opacity: hidden ? 0 : 1 }}
+            exit={{ scale: 0.4, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 30 }}
+          >
+            {label} ↗
+          </motion.div>
+        ) : (
+          <motion.div
+            key="dot"
+            className="-ml-[20px] -mt-[20px] h-10 w-10 bg-white mix-blend-difference"
+            initial={{ scale: 0 }}
+            animate={{ scale: hidden ? 0 : down ? 0.18 : hover ? 0.7 : 0.26, rotate: hover ? 45 : 0 }}
+            exit={{ scale: 0 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 30 }}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }

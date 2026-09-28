@@ -1,33 +1,31 @@
 import { animate, motion, useMotionValue, useTransform } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { COLORS } from './Stage'
+import { site } from '../data/site'
 import { EASE } from '../lib/motion'
 
-const GREETINGS = ['hello', 'namaste', 'hola', 'bonjour', 'hi there']
-const STRIPES = [COLORS.cobalt, COLORS.lime, COLORS.tang, COLORS.pink]
+const COLS = 8
+const ROWS = 5
 
 /**
- * Greetings flip through while a counter runs, then four colour
- * stripes sweep up and away to reveal the page.
+ * A boxed counter fills up, then the screen breaks into a grid of tiles
+ * that fall away in a diagonal wave to reveal the page.
  */
 export default function Preloader({ onDone }) {
   const count = useMotionValue(0)
-  const pct = useTransform(count, (v) => `${Math.round(v)}%`)
-  const [i, setI] = useState(0)
-  const [sweep, setSweep] = useState(false)
+  const pct = useTransform(count, (v) => String(Math.round(v)).padStart(3, '0'))
+  const width = useTransform(count, (v) => `${v}%`)
+  const [tiles, setTiles] = useState(false)
 
   useEffect(() => {
     document.documentElement.style.overflow = 'hidden'
-    const c = animate(count, 100, { duration: 1.9, ease: [0.65, 0, 0.35, 1] })
-    const id = setInterval(() => setI((n) => Math.min(n + 1, GREETINGS.length - 1)), 380)
-    const t1 = setTimeout(() => setSweep(true), 2000)
+    const c = animate(count, 100, { duration: 1.8, ease: [0.65, 0, 0.35, 1] })
+    const t1 = setTimeout(() => setTiles(true), 1950)
     const t2 = setTimeout(() => {
       document.documentElement.style.overflow = ''
       onDone?.()
-    }, 2650)
+    }, 2000)
     return () => {
       c.stop()
-      clearInterval(id)
       clearTimeout(t1)
       clearTimeout(t2)
       document.documentElement.style.overflow = ''
@@ -35,45 +33,46 @@ export default function Preloader({ onDone }) {
   }, [count, onDone])
 
   return (
-    <motion.div className="fixed inset-0 z-[90]" exit={{ pointerEvents: 'none' }}>
-      {/* base */}
+    <motion.div className="fixed inset-0 z-[90]" exit={{ pointerEvents: 'none', transition: { delay: 1.2 } }}>
+      {/* tile grid that covers everything, then falls away on exit */}
+      <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)`, gridTemplateRows: `repeat(${ROWS}, 1fr)` }}>
+        {Array.from({ length: COLS * ROWS }).map((_, i) => {
+          const x = i % COLS
+          const y = Math.floor(i / COLS)
+          return (
+            <motion.div
+              key={i}
+              className="-m-px bg-deep"
+              initial={{ scaleY: 1 }}
+              exit={{ scaleY: 0, transition: { duration: 0.6, ease: EASE.quart, delay: (x + y) * 0.045 } }}
+              style={{ originY: 0 }}
+            />
+          )
+        })}
+      </div>
+
+      {/* counter panel */}
       <motion.div
-        className="absolute inset-0 flex flex-col justify-between bg-cream p-5 text-ink md:p-10"
-        exit={{ opacity: 0, transition: { duration: 0.01, delay: 0.3 } }}
+        className="absolute inset-0 flex flex-col justify-between p-4 text-bright md:p-8"
+        animate={{ opacity: tiles ? 0 : 1 }}
+        transition={{ duration: 0.2 }}
       >
-        <div className="eyebrow flex justify-between">
-          <span>Rachit Shrivastava</span>
-          <motion.span>{pct}</motion.span>
+        <div className="eyebrow flex justify-between border-b border-bright/30 pb-3">
+          <span>{site.name}</span>
+          <span>Portfolio — {new Date().getFullYear()}</span>
         </div>
-        <div className="flex items-center justify-center">
-          <motion.h1
-            key={GREETINGS[i]}
-            className="display text-[18vw] md:text-[12vw]"
-            initial={{ y: 40, opacity: 0, rotate: -4 }}
-            animate={{ y: 0, opacity: 1, rotate: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 18 }}
-          >
-            {GREETINGS[i]}
-            <span className="text-cobalt">.</span>
-          </motion.h1>
-        </div>
-        <div className="bg-line h-1.5 w-full overflow-hidden rounded-full">
-          <motion.div className="h-full rounded-full bg-ink" style={{ width: pct }} />
+        <div className="grid grid-cols-12 items-end gap-4 border-t border-bright/30 pt-4">
+          <div className="col-span-12 md:col-span-8">
+            <p className="eyebrow mb-3 text-bright/70">Loading</p>
+            <div className="h-px w-full bg-bright/25">
+              <motion.div className="h-full bg-bright" style={{ width }} />
+            </div>
+          </div>
+          <motion.span className="display col-span-12 text-right text-[26vw] leading-[0.8] tabular-nums md:col-span-4 md:text-[12vw]">
+            {pct}
+          </motion.span>
         </div>
       </motion.div>
-
-      {/* colour stripes */}
-      {STRIPES.map((c, n) => (
-        <motion.div
-          key={c}
-          className="absolute inset-0"
-          style={{ background: c, zIndex: n + 1 }}
-          initial={{ y: '100%' }}
-          animate={sweep ? { y: '0%' } : { y: '100%' }}
-          exit={{ y: '-100%', transition: { duration: 0.8, ease: EASE.quart, delay: (STRIPES.length - 1 - n) * 0.09 } }}
-          transition={{ duration: 0.6, ease: EASE.quart, delay: n * 0.09 }}
-        />
-      ))}
     </motion.div>
   )
 }

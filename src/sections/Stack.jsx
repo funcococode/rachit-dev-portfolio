@@ -1,85 +1,64 @@
-import { motion, useInView } from 'framer-motion'
-import { useMemo, useRef } from 'react'
+import { motion } from 'framer-motion'
 import Marquee from '../components/Marquee'
 import SectionLabel from '../components/SectionLabel'
 import SplitText from '../components/SplitText'
-import { COLORS, Stage } from '../components/Stage'
+import { Stage } from '../components/Stage'
 import { marqueeStack, stack } from '../data/site'
+import { EASE, pad } from '../lib/motion'
 
-const CHIP_COLORS = ['bg-lime', 'bg-pink', 'bg-sky', 'bg-tang', 'bg-cream', 'bg-cobalt !text-cream']
-
-/**
- * The toolkit as a pile of draggable chips that tumble into place when the
- * section scrolls into view.
- */
+/** The toolkit as a ruled table — one column per layer of the stack. */
 export default function Stack() {
-  const pile = useRef(null)
-  const inView = useInView(pile, { once: true, amount: 0.3 })
-  const chips = useMemo(
-    () =>
-      stack.flatMap((g, gi) =>
-        g.items.map((item, ii) => ({
-          item,
-          group: g.group,
-          color: CHIP_COLORS[(gi * 3 + ii) % CHIP_COLORS.length],
-          rotate: ((gi * 7 + ii * 13) % 24) - 12,
-          delay: (gi * g.items.length + ii) * 0.035,
-        })),
-      ),
-    [],
-  )
-
   return (
-    <Stage id="stack" bg={COLORS.ink} fg={COLORS.cream} className="overflow-hidden py-28 md:py-40">
-      <div className="container-x">
-        <SectionLabel index="04">Toolkit</SectionLabel>
-        <div className="mt-12 flex flex-col justify-between gap-6 md:mt-16 md:flex-row md:items-end">
-          <SplitText as="h2" by="chars" className="display text-[15vw] lowercase md:text-[9vw]">
-            my toolbox
+    <Stage id="stack" tone="light">
+      <SectionLabel index="04" aside="Toolkit">
+        Stack
+      </SectionLabel>
+      <div className="grid border-b rule md:grid-cols-12">
+        <div className="px-4 py-10 md:col-span-8 md:border-r md:rule md:px-8 md:py-16">
+          <SplitText as="h2" by="chars" className="display text-[17vw] md:text-[9vw]">
+            Tools I use
           </SplitText>
-          <p className="muted max-w-xs text-lg">Everything I reach for, from the first component to the last deploy. Go on, throw them around.</p>
         </div>
-
-        <div
-          ref={pile}
-          className="relative mt-14 flex min-h-[380px] flex-wrap content-end items-end justify-center gap-3 rounded-[32px] border-2 border-dashed border-cream/20 p-6 md:mt-20 md:gap-4 md:p-12"
-        >
-          {chips.map((c) => (
-            <motion.div
-              key={c.item}
-              drag
-              dragConstraints={pile}
-              dragElastic={0.3}
-              whileDrag={{ scale: 1.15, zIndex: 20 }}
-              whileHover={{ scale: 1.08, rotate: 0 }}
-              initial={{ y: -500, opacity: 0, rotate: c.rotate * 3 }}
-              animate={inView ? { y: 0, opacity: 1, rotate: c.rotate } : {}}
-              transition={{ type: 'spring', stiffness: 140, damping: 11, delay: c.delay }}
-              data-cursor="Drag"
-              className={`sticker touch-none select-none text-base md:text-2xl ${c.color}`}
-              title={c.group}
-            >
-              {c.item}
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
-          {stack.map((g) => (
-            <div key={g.group} className="line border-t-2 pt-3">
-              <p className="font-bold">{g.group}</p>
-              <p className="muted mt-1 text-sm">{g.items.join(' · ')}</p>
-            </div>
-          ))}
+        <div className="flex items-end px-4 pb-10 md:col-span-4 md:px-8 md:py-16">
+          <p className="muted max-w-sm text-lg">Everything I reach for, from the first component to the last deploy.</p>
         </div>
       </div>
 
-      <div className="mt-24 -rotate-3 border-y-2 border-ink bg-lime py-4 text-ink md:mt-32">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4">
+        {stack.map((g, gi) => (
+          <div key={g.group} className={`border-b rule ${gi < stack.length - 1 ? 'lg:border-r' : ''} ${gi % 2 === 0 ? 'sm:border-r' : ''}`}>
+            <div className="flex items-center justify-between border-b rule bg-[var(--fg)] px-4 py-4 text-[var(--bg)] md:px-8">
+              <span className="font-semibold">{g.group}</span>
+              <span className="font-mono text-xs">{pad(g.items.length)}</span>
+            </div>
+            <ul>
+              {g.items.map((it, ii) => (
+                <motion.li
+                  key={it}
+                  className="group relative isolate overflow-hidden border-b rule-soft last:border-b-0"
+                  initial={{ opacity: 0, x: -12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, ease: EASE.expo, delay: gi * 0.06 + ii * 0.04 }}
+                >
+                  <span className="absolute inset-0 -z-10 origin-left scale-x-0 bg-[var(--fg)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" />
+                  <span className="flex items-center justify-between px-4 py-3.5 text-lg transition-colors duration-300 group-hover:text-[var(--bg)] md:px-8">
+                    {it}
+                    <span className="font-mono text-[10px] opacity-60">{pad(ii + 1)}</span>
+                  </span>
+                </motion.li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div className="border-b rule bg-[var(--fg)] py-5 text-[var(--bg)]">
         <Marquee speed={-2.5} skew={false}>
           {marqueeStack.map((t) => (
             <span key={t} className="flex items-center">
-              <span className="display px-6 text-4xl lowercase md:text-6xl">{t}</span>
-              <span className="text-3xl md:text-5xl">✦</span>
+              <span className="display px-8 text-4xl md:text-6xl">{t}</span>
+              <span className="inline-block h-3 w-3 bg-current" />
             </span>
           ))}
         </Marquee>

@@ -1,66 +1,75 @@
-import { animate, motion, useInView, useMotionValue } from 'framer-motion'
+import { motion, useInView, useMotionValue } from 'framer-motion'
 import { createContext, forwardRef, useCallback, useContext, useEffect, useRef } from 'react'
 
 /**
- * Kinetic colour system.
+ * Two-tone colour system.
  *
- * <ColorStage> owns two motion values — the page background and foreground —
- * and paints them on a full-page wrapper. Each <Stage bg fg> section tells the
- * stage "I'm on screen now", and the whole page smoothly morphs to its colours.
+ * Every <Stage> is a solid block: tone="light" is green on cream,
+ * tone="dark" is cream on green. It exposes its colours as the CSS
+ * variables --bg / --fg so children (FillBox hovers, tables, borders)
+ * can invert themselves without knowing which tone they're in.
+ *
+ * <ColorStage> tracks which stage is currently under the navigation bar,
+ * so the fixed nav and the cursor always match the block beneath them.
  */
 
+// CSS variables, so every section re-colours instantly when the theme changes
 export const COLORS = {
-  cream: '#f3eee3',
-  ink: '#141414',
-  cobalt: '#2f3cff',
-  lime: '#d4ff3a',
-  tang: '#ff6a3d',
-  pink: '#ffb4dc',
-  sky: '#9fd8ff',
+  green: 'var(--theme-dark)',
+  cream: 'var(--theme-light)',
 }
 
 const StageContext = createContext(null)
 export const useStage = () => useContext(StageContext)
 
-export function ColorStage({ children, bg = COLORS.cream, fg = COLORS.ink }) {
+export function ColorStage({ children, bg = COLORS.cream, fg = COLORS.green }) {
   const bgMV = useMotionValue(bg)
   const fgMV = useMotionValue(fg)
-  const current = useRef({ bg, fg })
 
   const setColors = useCallback(
     (next) => {
-      if (current.current.bg === next.bg && current.current.fg === next.fg) return
-      current.current = next
-      animate(bgMV, next.bg, { duration: 0.9, ease: [0.33, 1, 0.68, 1] })
-      animate(fgMV, next.fg, { duration: 0.9, ease: [0.33, 1, 0.68, 1] })
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next.bg)
+      if (bgMV.get() === next.bg && fgMV.get() === next.fg) return
+      bgMV.set(next.bg)
+      fgMV.set(next.fg)
+      const resolved = getComputedStyle(document.documentElement).getPropertyValue(next.bg.slice(4, -1)).trim()
+      if (resolved) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved)
     },
     [bgMV, fgMV],
   )
 
   return (
     <StageContext.Provider value={{ bg: bgMV, fg: fgMV, setColors }}>
-      <motion.div style={{ backgroundColor: bgMV, color: fgMV }} className="min-h-screen">
+      <motion.div style={{ '--bg': bgMV, '--fg': fgMV }} className="min-h-screen bg-cream text-green">
         {children}
       </motion.div>
     </StageContext.Provider>
   )
 }
 
-/** A section that claims the page colours while it's in the middle of the viewport. */
-export const Stage = forwardRef(function Stage({ as = 'section', bg, fg, children, className = '', ...rest }, outerRef) {
+export const Stage = forwardRef(function Stage(
+  { as = 'section', tone = 'light', bg: bgProp, fg: fgProp, children, className = '', style, ...rest },
+  outerRef,
+) {
+  const bg = bgProp ?? (tone === 'dark' ? COLORS.green : COLORS.cream)
+  const fg = fgProp ?? (tone === 'dark' ? COLORS.cream : COLORS.green)
   const innerRef = useRef(null)
   const ref = outerRef ?? innerRef
   const stage = useStage()
-  const inView = useInView(ref, { margin: '-50% 0px -50% 0px' })
+  // "in view" = overlapping the strip at the very top of the screen, under the nav
+  const underNav = useInView(ref, { margin: '0px 0px -94% 0px' })
 
   useEffect(() => {
-    if (inView) stage?.setColors({ bg, fg })
-  }, [inView, bg, fg, stage])
+    if (underNav) stage?.setColors({ bg, fg })
+  }, [underNav, bg, fg, stage])
 
   const Tag = as
   return (
-    <Tag ref={ref} className={`relative ${className}`} {...rest}>
+    <Tag
+      ref={ref}
+      className={`relative ${className}`}
+      style={{ backgroundColor: bg, color: fg, '--bg': bg, '--fg': fg, ...style }}
+      {...rest}
+    >
       {children}
     </Tag>
   )

@@ -5,24 +5,28 @@ import { Link, useLocation } from 'react-router-dom'
 import { NAV_LINKS, useGoToSection } from '../hooks/useGoToSection'
 import { site } from '../data/site'
 import { EASE } from '../lib/motion'
-import Magnetic from './Magnetic'
+import FillBox from './FillBox'
+import LocalTime from './LocalTime'
 import RollText from './RollText'
-import { COLORS, useStage } from './Stage'
+import ModeToggle from './ModeToggle'
+import ThemeSwitcher from './ThemeSwitcher'
 
 /**
- * Floating pill nav. Its colours are the inverse of whatever section is on
- * screen, so it always stands out as the page morphs.
+ * A ruled navigation bar split into cells. It takes the colours of whatever
+ * section is underneath and slides away while you scroll down.
  */
 export default function Nav() {
-  const [compact, setCompact] = useState(false)
+  const [hidden, setHidden] = useState(false)
   const [open, setOpen] = useState(false)
   const { scrollY } = useScroll()
   const go = useGoToSection()
   const lenis = useLenis()
   const { pathname } = useLocation()
-  const stage = useStage()
 
-  useMotionValueEvent(scrollY, 'change', (y) => setCompact(y > 120))
+  useMotionValueEvent(scrollY, 'change', (y) => {
+    const prev = scrollY.getPrevious() ?? 0
+    setHidden(y > prev && y > 160)
+  })
 
   useEffect(() => {
     if (open) lenis?.stop()
@@ -35,109 +39,116 @@ export default function Nav() {
     setOpen(false)
   }
 
-  const isActive = (l) => (l.to ? pathname === l.to : false)
-
   return (
     <>
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
-        <div className="container-x flex items-start justify-between pt-4 md:pt-6">
-          <Magnetic className="pointer-events-auto">
-            <Link to="/" aria-label="Home">
-              <motion.span
-                className="flex h-12 w-12 items-center justify-center rounded-full text-sm font-extrabold md:h-14 md:w-14"
-                style={{ backgroundColor: stage?.fg, color: stage?.bg }}
-                whileHover={{ rotate: -12, scale: 1.05 }}
-              >
-                {site.initials}
-              </motion.span>
-            </Link>
-          </Magnetic>
+      <motion.header
+        className="fixed inset-x-0 top-0 z-50 border-b rule bg-[var(--bg)] text-[var(--fg)]"
+        animate={{ y: hidden && !open ? '-100%' : '0%' }}
+        transition={{ duration: 0.5, ease: EASE.expo }}
+      >
+        <div className="flex h-14 items-stretch md:h-16">
+          <Link to="/" className="group flex items-center gap-3 border-r rule px-4 md:px-8" aria-label="Home">
+            <span className="flex h-8 w-8 items-center justify-center bg-[var(--fg)] text-xs font-bold text-[var(--bg)]">
+              {site.initials}
+            </span>
+            <span className="hidden text-sm font-semibold sm:inline">
+              <RollText>{site.name}</RollText>
+            </span>
+          </Link>
 
-          <motion.nav
-            className="pointer-events-auto hidden items-center gap-1 rounded-full p-1.5 md:flex"
-            style={{ backgroundColor: stage?.fg, color: stage?.bg }}
-            animate={{ scale: compact ? 0.92 : 1, y: compact ? -4 : 0 }}
-            transition={{ duration: 0.5, ease: EASE.expo }}
-          >
-            {NAV_LINKS.map((l) => (
-              <button
-                key={l.label}
-                onClick={() => go(l.to ?? l.id)}
-                className={`group relative rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                  isActive(l) ? 'bg-lime text-ink' : 'hover:bg-[color-mix(in_srgb,currentColor_14%,transparent)]'
-                }`}
-              >
-                <RollText>{l.label}</RollText>
-              </button>
-            ))}
-          </motion.nav>
+          <nav className="hidden flex-1 items-stretch justify-end md:flex">
+            {NAV_LINKS.map((l) => {
+              const active = l.to && pathname === l.to
+              return (
+                <FillBox
+                  key={l.label}
+                  onClick={() => go(l.to ?? l.id)}
+                  className={`border-l rule px-4 text-sm font-medium lg:px-6 ${active ? 'bg-[var(--fg)] text-[var(--bg)]' : ''}`}
+                >
+                  {l.label}
+                </FillBox>
+              )
+            })}
+            <div className="flex items-center border-l rule px-3 lg:px-4">
+              <ThemeSwitcher size={14} />
+            </div>
+            <div className="flex items-center border-l rule px-4">
+              <ModeToggle showLabel={false} className="lg:hidden" />
+              <ModeToggle className="hidden lg:flex" />
+            </div>
+            <div className="hidden items-center border-l rule px-6 font-mono text-xs xl:flex">
+              <LocalTime />
+            </div>
+          </nav>
 
-          <div className="pointer-events-auto flex items-center gap-3">
-            <motion.a
-              href={`mailto:${site.email}`}
-              className="sticker hidden bg-lime text-sm lg:inline-flex lg:items-center lg:gap-2"
-              whileHover={{ rotate: -4, scale: 1.05 }}
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ink opacity-50" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-ink" />
-              </span>
-              Open to work
-            </motion.a>
-            <Magnetic className="md:hidden">
-              <motion.button
-                onClick={() => setOpen((o) => !o)}
-                className="relative flex h-12 w-12 items-center justify-center rounded-full"
-                style={{ backgroundColor: open ? COLORS.lime : stage?.fg, color: open ? COLORS.ink : stage?.bg }}
-                aria-label={open ? 'Close menu' : 'Open menu'}
-                aria-expanded={open}
-              >
-                <motion.span className="absolute h-0.5 w-5 rounded bg-current" animate={open ? { rotate: 45, y: 0 } : { rotate: 0, y: -4 }} />
-                <motion.span className="absolute h-0.5 w-5 rounded bg-current" animate={open ? { rotate: -45, y: 0 } : { rotate: 0, y: 4 }} />
-              </motion.button>
-            </Magnetic>
+          <div className="ml-auto flex items-center border-l rule px-4 md:hidden">
+            <ModeToggle showLabel={false} />
           </div>
+          <button
+            onClick={() => setOpen((o) => !o)}
+            className="flex w-14 items-center justify-center border-l rule md:hidden"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+          >
+            <span className="relative block h-3 w-5">
+              <motion.span className="absolute left-0 top-0 h-px w-full bg-current" animate={open ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }} />
+              <motion.span className="absolute left-0 top-1/2 h-px w-full bg-current" animate={{ opacity: open ? 0 : 1 }} />
+              <motion.span className="absolute bottom-0 left-0 h-px w-full bg-current" animate={open ? { rotate: -45, y: -5 } : { rotate: 0, y: 0 }} />
+            </span>
+          </button>
         </div>
-      </header>
+      </motion.header>
 
       <AnimatePresence>{open && <MenuOverlay onClose={() => setOpen(false)} go={go} />}</AnimatePresence>
     </>
   )
 }
 
-const MENU_COLORS = ['bg-cobalt text-cream', 'bg-lime text-ink', 'bg-tang text-ink', 'bg-pink text-ink', 'bg-sky text-ink']
-
 function MenuOverlay({ onClose, go }) {
   return (
     <motion.div
-      className="fixed inset-0 z-40 flex flex-col justify-end bg-ink px-4 pb-8 pt-24"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { delay: 0.3 } }}
+      className="fixed inset-0 z-40 flex flex-col bg-green pt-14 text-cream"
+      initial={{ clipPath: 'inset(0 0 100% 0)' }}
+      animate={{ clipPath: 'inset(0 0 0% 0)' }}
+      exit={{ clipPath: 'inset(0 0 100% 0)' }}
+      transition={{ duration: 0.7, ease: EASE.quart }}
     >
-      <ul className="flex flex-col gap-2">
+      <ul className="mt-auto border-t border-cream">
         {NAV_LINKS.map((l, i) => (
-          <motion.li
-            key={l.label}
-            initial={{ x: '-110%', rotate: -6 }}
-            animate={{ x: 0, rotate: i % 2 ? 1.5 : -1.5 }}
-            exit={{ x: '110%', rotate: 6, transition: { duration: 0.4, ease: EASE.quart, delay: i * 0.03 } }}
-            transition={{ type: 'spring', stiffness: 200, damping: 20, delay: 0.05 + i * 0.06 }}
-          >
-            <button
-              className={`flex w-full items-center justify-between rounded-3xl border-2 border-ink px-6 py-4 text-left ${MENU_COLORS[i % MENU_COLORS.length]}`}
+          <li key={l.label} className="overflow-hidden border-b border-cream">
+            <motion.button
+              className="flex w-full items-baseline justify-between px-4 py-5 text-left"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ duration: 0.7, ease: EASE.expo, delay: 0.2 + i * 0.05 }}
               onClick={() => {
                 onClose()
-                setTimeout(() => go(l.to ?? l.id), 350)
+                setTimeout(() => go(l.to ?? l.id), 400)
               }}
             >
               <span className="display text-5xl">{l.label}</span>
-              <span className="text-2xl">↗</span>
-            </button>
-          </motion.li>
+              <span className="font-mono text-xs">0{i + 1}</span>
+            </motion.button>
+          </li>
         ))}
       </ul>
-      <p className="eyebrow mt-8 text-cream/60">{site.email}</p>
+      <div className="flex items-center justify-between border-b border-cream px-4 py-4">
+        <span className="font-mono text-[11px] uppercase tracking-[0.16em]">Theme</span>
+        <ThemeSwitcher size={22} />
+      </div>
+      <div className="flex items-center justify-between border-b border-cream px-4 py-4">
+        <span className="font-mono text-[11px] uppercase tracking-[0.16em]">Mode</span>
+        <ModeToggle />
+      </div>
+      <div className="grid grid-cols-2 text-sm">
+        <a href={`mailto:${site.email}`} className="truncate border-r border-cream px-4 py-5">
+          {site.email}
+        </a>
+        <div className="px-4 py-5 text-right font-mono">
+          <LocalTime />
+        </div>
+      </div>
     </motion.div>
   )
 }
