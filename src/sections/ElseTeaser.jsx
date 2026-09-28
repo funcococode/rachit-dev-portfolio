@@ -10,7 +10,7 @@ export default function ElseTeaser() {
       <SectionLabel index="05" aside="Off the clock">
         Beyond code
       </SectionLabel>
-      <FillBox as={Link} to="/else" data-cursor="Explore" className="block w-full border-b rule px-4 py-14 text-left md:px-8 md:py-24">
+      <FillBox as={Link} to="/else" data-cursor="Explore" className="w-full border-b rule px-4 py-14 text-left md:px-8 md:py-24">
         <span>
           <span className="display block text-[12vw] md:text-[7vw]">What else I do</span>
           <span className="mt-4 block max-w-lg text-lg opacity-80">Music, physics, philosophy and a lot of travel — the rest of me.</span>

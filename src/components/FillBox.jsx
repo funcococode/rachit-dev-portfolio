@@ -10,7 +10,7 @@ import { forwardRef } from 'react'
  */
 const FillBox = forwardRef(function FillBox({ as: Tag = 'button', children, className = '', fillClassName = '', ...rest }, ref) {
   return (
-    <Tag ref={ref} className={`group relative isolate overflow-hidden ${className}`} {...rest}>
+    <Tag ref={ref} className={`group relative isolate flex overflow-hidden ${className}`} {...rest}>
       <span
         aria-hidden
         className={`absolute inset-0 -z-10 translate-y-full bg-[var(--fg)] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-0 ${fillClassName}`}

@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLenis } from 'lenis/react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { site } from '../data/site'
 import FillBox from './FillBox'
 import LocalTime from './LocalTime'
@@ -10,8 +11,12 @@ import SplitText from './SplitText'
 import { Stage } from './Stage'
 import VariableText from './VariableText'
 
-/** Contact call-to-action + footer. Shared by every page. */
-export default function Footer() {
+/**
+ * Contact call-to-action + footer. Shared by every page.
+ * `minimal` drops the call-to-action and contact details (used on /contact,
+ * where the form already covers them) and keeps just the name + copyright.
+ */
+export default function Footer({ minimal = false }) {
   const lenis = useLenis()
   const [copied, setCopied] = useState(false)
 
@@ -27,6 +32,8 @@ export default function Footer() {
 
   return (
     <Stage as="footer" id="contact" tone="light" className="overflow-hidden">
+      {!minimal && (
+        <>
       <SectionLabel index="—" aside={site.available ? 'Available for new projects' : 'Currently booked'}>
         Contact
       </SectionLabel>
@@ -41,18 +48,18 @@ export default function Footer() {
           </SplitText>
         </div>
         <div className="flex items-stretch md:col-span-4">
-          <a
-              href={`mailto:${site.email}`}
-              data-cursor="Write to me"
-              className="group relative isolate flex w-full flex-col justify-between overflow-hidden bg-[var(--fg)] p-4 text-[var(--bg)] max-md:min-h-[220px] md:p-8"
-            >
-              <span className="absolute inset-0 -z-10 translate-y-full bg-[var(--bg)] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-0" />
-              <span className="flex justify-between font-mono text-xs uppercase tracking-[0.16em] transition-colors duration-500 group-hover:text-[var(--fg)]">
-                <span>Start a project</span>
-                <span className="text-2xl leading-none transition-transform duration-500 group-hover:-rotate-45">→</span>
-              </span>
-              <span className="display text-5xl transition-colors duration-500 group-hover:text-[var(--fg)] md:text-6xl">Get in touch</span>
-          </a>
+          <Link
+            to="/contact"
+            data-cursor="Let’s talk"
+            className="group relative isolate flex w-full flex-col justify-between overflow-hidden bg-[var(--fg)] p-4 text-[var(--bg)] max-md:min-h-[220px] md:p-8"
+          >
+            <span className="absolute inset-0 -z-10 translate-y-full bg-[var(--bg)] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-0" />
+            <span className="flex justify-between font-mono text-xs uppercase tracking-[0.16em] transition-colors duration-500 group-hover:text-[var(--fg)]">
+              <span>Start a project</span>
+              <span className="text-2xl leading-none transition-transform duration-500 group-hover:-rotate-45">→</span>
+            </span>
+            <span className="display text-5xl transition-colors duration-500 group-hover:text-[var(--fg)] md:text-6xl">Get in touch</span>
+          </Link>
         </div>
       </div>
 
@@ -105,8 +112,11 @@ export default function Footer() {
         </FillBox>
       </div>
 
+        </>
+      )}
+
       {/* full name, set large — letters change weight near the cursor */}
-      <div className="border-b rule px-4 pb-4 pt-10 md:px-8 md:pt-16">
+      <div className={`border-b rule px-4 pb-4 pt-10 md:px-8 md:pt-16 ${minimal ? '-mt-px border-t' : ''}`}>
         <VariableText
           text={site.name}
           min={200}

@@ -7,7 +7,7 @@ export const NAV_LINKS = [
   { label: 'About', id: 'about' },
   { label: 'Stack', id: 'stack' },
   { label: 'What else', to: '/else' },
-  { label: 'Contact', id: 'contact' },
+  { label: 'Contact', to: '/contact' },
 ]
 
 /** Scrolls to a section on the home page (or a page route) from anywhere. */

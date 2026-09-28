@@ -9,6 +9,7 @@ import { ColorStage } from './components/Stage'
 import { LoaderContext } from './hooks/useLoader'
 import { ThemeProvider } from './hooks/useTheme'
 import CaseStudy from './pages/CaseStudy'
+import Contact from './pages/Contact'
 import Else from './pages/Else'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
@@ -50,6 +51,7 @@ function AnimatedRoutes() {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Home />} />
         <Route path="/else" element={<Else />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/work/:slug" element={<CaseStudy />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

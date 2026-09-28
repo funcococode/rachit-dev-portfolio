@@ -148,3 +148,46 @@ export const curiosities = {
     project: 'trip-unplanned',
   },
 }
+
+// ─── Contact page ──────────────────────────────────────────────
+export const contact = {
+  // WhatsApp number in international format, digits only (91 = India)
+  whatsapp: '917000584572',
+  // Free key from https://web3forms.com (enter your email, they send you a key).
+  // With a key, the form sends email directly from the page. Without one it
+  // falls back to opening the visitor's email app with everything pre-filled.
+  web3formsKey: '',
+  topics: [
+    {
+      id: 'project',
+      label: 'Freelance project',
+      questions: [
+        'Can you build a website or web app for me?',
+        'What would a project like mine cost?',
+        'What’s your availability for a new project?',
+        'Can you help improve or fix an existing product?',
+      ],
+    },
+    {
+      id: 'role',
+      label: 'Job / contract role',
+      questions: ['Are you open to new full-time roles?', 'Are you available for contract work?', 'Can we schedule a call or interview?'],
+    },
+    {
+      id: 'collab',
+      label: 'Collaboration',
+      questions: ['Want to build a side project together?', 'Would you speak or write about your work?', 'Can we partner on a product idea?'],
+    },
+    {
+      id: 'music',
+      label: 'Music',
+      questions: ['Can we collaborate on a song?', 'Are you available for vocals or production?', 'Can I use your music in my project?'],
+    },
+    {
+      id: 'hello',
+      label: 'Just saying hi',
+      questions: ['Loved your portfolio!', 'Question about how you built this site', 'Let’s talk physics, philosophy or travel'],
+    },
+  ],
+  budgets: ['< ₹50k', '₹50k – 2L', '₹2L – 5L', '₹5L +', 'Not sure yet'],
+}
