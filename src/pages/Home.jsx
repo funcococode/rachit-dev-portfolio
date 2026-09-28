@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom'
 import Footer from '../components/Footer'
 import Marquee from '../components/Marquee'
 import PageTransition from '../components/PageTransition'
+import { Stage } from '../components/Stage'
 import About from '../sections/About'
 import ElseTeaser from '../sections/ElseTeaser'
 import Hero from '../sections/Hero'
@@ -11,7 +12,7 @@ import Services from '../sections/Services'
 import Stack from '../sections/Stack'
 import Work from '../sections/Work'
 
-const BAND = ['full-stack development', 'web apps', 'mobile apps', 'cloud & devops', 'ui engineering']
+const BAND = ['Full-stack development', 'Web apps', 'Mobile apps', 'Cloud & DevOps', 'UI engineering']
 
 export default function Home() {
   const { hash } = useLocation()
@@ -35,16 +36,16 @@ export default function Home() {
     <PageTransition>
       <main>
         <Hero />
-        <div className="relative z-10 rotate-[1.5deg] scale-[1.03] border-y-2 border-ink bg-ink py-4 text-cream">
+        <Stage as="div" tone="dark" className="border-y rule py-4">
           <Marquee speed={-2} skew={false}>
-            {BAND.map((t, i) => (
+            {BAND.map((t) => (
               <span key={t} className="flex items-center">
-                <span className="px-6 text-3xl font-bold md:text-4xl">{t}</span>
-                <span className={`inline-block h-6 w-6 rounded-full border-2 border-cream ${['bg-lime', 'bg-pink', 'bg-sky', 'bg-tang', 'bg-cobalt'][i]}`} />
+                <span className="px-8 text-2xl font-semibold tracking-[-0.02em] md:text-3xl">{t}</span>
+                <span className="inline-block h-2.5 w-2.5 bg-current" />
               </span>
             ))}
           </Marquee>
-        </div>
+        </Stage>
         <About />
         <Work />
         <Services />

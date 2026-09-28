@@ -1,24 +1,24 @@
 import { Link } from 'react-router-dom'
+import FillBox from '../components/FillBox'
 import PageTransition from '../components/PageTransition'
-import { COLORS, Stage } from '../components/Stage'
-import Sticker from '../components/Sticker'
+import { Stage } from '../components/Stage'
 import VariableText from '../components/VariableText'
-import { useRef } from 'react'
 
 export default function NotFound() {
-  const ref = useRef(null)
   return (
     <PageTransition>
-      <Stage bg={COLORS.pink} fg={COLORS.ink}>
-        <main ref={ref} className="container-x relative flex min-h-screen flex-col items-start justify-center gap-8 overflow-hidden">
-          <VariableText text="404" className="display text-[34vw] md:text-[22vw]" />
-          <p className="text-3xl font-bold md:text-5xl">this page wandered off.</p>
-          <Link to="/" className="sticker bg-lime text-lg">
-            ← take me home
-          </Link>
-          <Sticker constraints={ref} color="cobalt" rotate={-12} style={{ top: '22%', right: '12%' }}>
-            lost?
-          </Sticker>
+      <Stage tone="dark">
+        <main className="flex min-h-screen flex-col justify-end pt-16">
+          <div className="border-y rule px-4 md:px-8">
+            <VariableText text="404" className="display block text-[36vw] leading-[0.85] md:text-[24vw]" />
+          </div>
+          <div className="grid md:grid-cols-2">
+            <p className="border-b rule px-4 py-8 text-2xl md:border-b-0 md:border-r md:px-8 md:text-3xl">This page doesn’t exist.</p>
+            <FillBox as={Link} to="/" className="px-4 py-8 text-2xl md:px-8 md:text-3xl">
+              <span>Back home</span>
+              <span>→</span>
+            </FillBox>
+          </div>
         </main>
       </Stage>
     </PageTransition>

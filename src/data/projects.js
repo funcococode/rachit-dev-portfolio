@@ -19,7 +19,7 @@ export const projects = [
     year: '2025',
     role: 'Design & Development',
     tagline: 'A website for a studio that builds worlds out of sound — made by someone who speaks the same language.',
-    theme: { bg: '#1a0f24', fg: '#f3e9ff', accent: '#ff7a3d', art: 'sound' },
+    theme: { tone: 'dark', art: 'sound' },
     stack: ['React', 'Next.js', 'Tailwind CSS', 'Framer Motion', 'Vercel'],
     images: [],
     overview:
@@ -50,7 +50,7 @@ export const projects = [
     year: '2025',
     role: 'Design & Development',
     tagline: 'Minimal hassle, maximum memories — a travel agency site that feels like the start of the trip.',
-    theme: { bg: '#0d2227', fg: '#e8f6f3', accent: '#ffb347', art: 'horizon' },
+    theme: { tone: 'light', art: 'horizon' },
     stack: ['React', 'Next.js', 'Tailwind CSS', 'Framer Motion'],
     images: [],
     overview:
@@ -81,7 +81,7 @@ export const projects = [
     year: '2026',
     role: 'Founder · Product & Full-stack',
     tagline: 'Never cancel a trip because your friends said no.',
-    theme: { bg: '#0f1f14', fg: '#eaf7e6', accent: '#c6f432', art: 'route' },
+    theme: { tone: 'dark', art: 'route' },
     stack: ['Next.js', 'TypeScript', 'PostgreSQL', 'Prisma', 'Supabase', 'Tailwind CSS'],
     images: [],
     overview:
@@ -114,7 +114,7 @@ export const projects = [
     year: '2026',
     role: 'Product, Design & Development',
     tagline: 'Build beautiful rate cards, fast.',
-    theme: { bg: '#0e1430', fg: '#e8ecff', accent: '#7c9cff', art: 'cards' },
+    theme: { tone: 'light', art: 'cards' },
     stack: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Vercel'],
     images: [],
     overview:
@@ -145,7 +145,7 @@ export const projects = [
     year: '2026',
     role: 'Design & Development',
     tagline: 'Web, mobile and cloud engineering — built with care, from concept to scale.',
-    theme: { bg: '#161616', fg: '#f2f2ec', accent: '#d7ff3a', art: 'stack' },
+    theme: { tone: 'dark', art: 'stack' },
     stack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Vercel'],
     images: [],
     overview:

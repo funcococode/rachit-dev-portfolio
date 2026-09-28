@@ -73,8 +73,8 @@ export default function Waveform({
         <span
           key={i}
           ref={(el) => (refs.current[i] = el)}
-          className={`block h-full flex-1 origin-center rounded-full will-change-transform ${
-            accentEvery && i % accentEvery === 0 ? 'bg-tang' : barClassName
+          className={`block h-full flex-1 origin-center will-change-transform ${
+            accentEvery && i % accentEvery === 0 ? 'opacity-50 bg-current' : barClassName
           }`}
           style={{ transform: 'scaleY(0.1)', maxWidth: 6 }}
         />

@@ -3,9 +3,9 @@ import { useRef } from 'react'
 
 /**
  * Paragraph whose words light up one by one as you scroll through it.
- * Wrap words in *asterisks* to render them as highlighted pills.
+ * Wrap words in *asterisks* to render them boxed.
  */
-export default function ScrollRevealText({ text, className = '', accentClassName = 'rounded-full bg-lime px-[0.3em] text-ink' }) {
+export default function ScrollRevealText({ text, className = '', accentClassName = 'border border-current px-[0.2em]' }) {
   const ref = useRef(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.85', 'end 0.45'] })
   const words = text.split(' ')

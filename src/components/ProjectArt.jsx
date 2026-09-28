@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useTheme } from '../hooks/useTheme'
 
 /**
  * Cover artwork for a project. Uses the first screenshot in
@@ -6,7 +7,16 @@ import { motion } from 'framer-motion'
  * gently animated illustration themed to the project.
  */
 export default function ProjectArt({ project, className = '', animated = true }) {
-  const { theme, images } = project
+  const { theme: palette } = useTheme()
+  const { images } = project
+  // resolve the project's tone against the active colour theme
+  const dark = project.theme.tone !== 'light'
+  const theme = {
+    art: project.theme.art,
+    bg: dark ? palette.dark : palette.light,
+    fg: dark ? palette.light : palette.dark,
+    accent: dark ? palette.light : palette.dark,
+  }
   if (images?.length) {
     return (
       <div className={`relative overflow-hidden ${className}`} style={{ background: theme.bg }}>
@@ -60,7 +70,7 @@ function Sound({ t, a }) {
             key={i}
             x={400 - bars.length * 6 + i * 12}
             width="6"
-            rx="3"
+            rx="0"
             fill={i % 7 === 3 ? t.accent : t.fg}
             initial={{ height: h, y: 300 - h / 2 }}
             animate={a ? { height: [h, h * 0.35, h], y: [300 - h / 2, 300 - (h * 0.35) / 2, 300 - h / 2] } : undefined}
@@ -95,8 +105,8 @@ function Horizon({ t, a }) {
         <motion.path
           key={i}
           d={`M0 ${380 + i * 50} C 160 ${320 + i * 40}, 260 ${420 + i * 40}, 420 ${360 + i * 50} S 700 ${300 + i * 55}, 800 ${360 + i * 45} L800 600 L0 600Z`}
-          fill={t.bg}
-          fillOpacity={0.55 + i * 0.15}
+          fill={t.fg}
+          fillOpacity={0.12 + i * 0.1}
           animate={a ? { x: [0, i % 2 ? 20 : -20] } : undefined}
           transition={loop(a, 7 + i)}
         />
@@ -177,15 +187,15 @@ function Cards({ t, a }) {
           transition={loop(a, 2.6 + i * 0.4)}
           style={{ originX: '70px', originY: '180px' }}
         >
-          <rect width="140" height="360" rx="14" fill={c.hi ? t.accent : t.fg} fillOpacity={c.hi ? 1 : 0.1} stroke={t.fg} strokeOpacity="0.25" />
-          <rect x="18" y="26" width="60" height="8" rx="4" fill={c.hi ? t.bg : t.fg} fillOpacity="0.8" />
+          <rect width="140" height="360" rx="0" fill={c.hi ? t.accent : t.fg} fillOpacity={c.hi ? 1 : 0.1} stroke={t.fg} strokeOpacity="0.25" />
+          <rect x="18" y="26" width="60" height="8" rx="0" fill={c.hi ? t.bg : t.fg} fillOpacity="0.8" />
           <text x="18" y="96" fontSize="40" fontFamily="Geist Variable, sans-serif" fontWeight="700" fill={c.hi ? t.bg : t.fg}>
             ₹{[9, 24, 49][i]}k
           </text>
           {[0, 1, 2, 3, 4].map((l) => (
-            <rect key={l} x="18" y={140 + l * 30} width={[100, 80, 92, 70, 86][l]} height="6" rx="3" fill={c.hi ? t.bg : t.fg} fillOpacity={c.hi ? 0.5 : 0.25} />
+            <rect key={l} x="18" y={140 + l * 30} width={[100, 80, 92, 70, 86][l]} height="6" rx="0" fill={c.hi ? t.bg : t.fg} fillOpacity={c.hi ? 0.5 : 0.25} />
           ))}
-          <rect x="18" y="300" width="104" height="36" rx="18" fill={c.hi ? t.bg : t.accent} />
+          <rect x="18" y="300" width="104" height="36" rx="0" fill={c.hi ? t.bg : t.accent} />
         </motion.g>
       ))}
     </g>

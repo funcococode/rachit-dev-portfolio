@@ -7,6 +7,7 @@ import Nav from './components/Nav'
 import Preloader from './components/Preloader'
 import { ColorStage } from './components/Stage'
 import { LoaderContext } from './hooks/useLoader'
+import { ThemeProvider } from './hooks/useTheme'
 import CaseStudy from './pages/CaseStudy'
 import Else from './pages/Else'
 import Home from './pages/Home'
@@ -20,13 +21,15 @@ export default function App() {
     <ReactLenis root options={{ lerp: 0.09, smoothWheel: true }}>
       <MotionConfig reducedMotion="user">
         <LoaderContext.Provider value={{ ready }}>
-          <ColorStage>
-            <AnimatePresence>{!ready && <Preloader key="preloader" onDone={done} />}</AnimatePresence>
-            <Cursor />
-            <ScrollProgress />
-            <Nav />
-            <AnimatedRoutes />
-          </ColorStage>
+          <ThemeProvider>
+            <ColorStage>
+              <AnimatePresence>{!ready && <Preloader key="preloader" onDone={done} />}</AnimatePresence>
+              <Cursor />
+              <ScrollProgress />
+              <Nav />
+              <AnimatedRoutes />
+            </ColorStage>
+          </ThemeProvider>
         </LoaderContext.Provider>
       </MotionConfig>
     </ReactLenis>
@@ -59,7 +62,7 @@ function ScrollProgress() {
   const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 40 })
   return (
     <motion.div
-      className="fixed inset-x-0 top-0 z-[55] h-1 origin-left bg-[linear-gradient(90deg,var(--color-cobalt),var(--color-tang),var(--color-lime))]"
+      className="fixed inset-x-0 top-0 z-[55] h-[3px] origin-left bg-[var(--fg)]"
       style={{ scaleX }}
     />
   )

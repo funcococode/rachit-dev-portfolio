@@ -4,7 +4,15 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0b0a09" />
+    <script>
+      // apply the saved colour theme + light/dark mode before first paint (no flash)
+      try {
+        var d = document.documentElement
+        d.dataset.theme = localStorage.getItem('rs-theme') || 'forest'
+        d.dataset.mode = localStorage.getItem('rs-mode') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      } catch (e) {}
+    </script>
+    <meta name="theme-color" content="#f8e7c9" />
     <title>Rachit Shrivastava — Full-stack Developer & Music Producer</title>
     <meta name="description" content="Rachit Shrivastava is a full-stack developer with 5 years of experience building web, mobile and cloud products — and a singer, songwriter, composer and music producer." />
     <meta property="og:title" content="Rachit Shrivastava — Full-stack Developer" />
